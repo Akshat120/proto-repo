@@ -46,9 +46,7 @@ jobs:
       - name: Commit and tag if push to main or master
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         env:
-          # Use GITHUB_TOKEN if workflow permissions are set to "Read and write"
-          # or uncomment the following line if using a PAT
-          # PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -64,5 +62,5 @@ jobs:
           git tag -a $TAG_NAME -m "Auto-generated tag for proto generation"
 
           # Push the commit and tag using the token
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} $TAG_NAME
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} $TAG_NAME
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
