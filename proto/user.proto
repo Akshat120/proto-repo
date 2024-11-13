@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-option go_package="proto-repo/protogen/go";
-
-message User {
-    string username = 1;
-    string email = 2;
-    string password = 3;
-}
