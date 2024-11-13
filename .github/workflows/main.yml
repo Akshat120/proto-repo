@@ -1,51 +1,65 @@
-name: Generate Go Files and Commit
+name: ProtoBuf Go Generator
 
 on:
   push:
     branches:
       - main
       - master
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
-  generate-and-commit:
+  generate-proto-go:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: '1.20'
+          go-version: '^1.22'
 
-      - name: Install dependencies
+      - name: Install Protobuf Compiler
         run: |
-          go mod download
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
 
-      - name: Generate Go files from proto
+      - name: Install protoc-gen-go plugin
         run: |
-          make generate
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        env:
+          GO111MODULE: "on"
 
-      - name: Configure git
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Generate Go source files from ProtoBuf
+        run: |
+          make generate  # Replace with your specific make command if needed
+        env:
+          GO111MODULE: "on"
+
+      - name: Commit and tag if push to main or master
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Check for changes and commit
-        run: |
+          # Commit changes if there are any
           if [[ -n "$(git status --porcelain)" ]]; then
             git add .
             git commit -m "Auto-generate Go files from proto on push to main/master"
-          else
-            echo "No changes to commit"
           fi
 
-      - name: Tag the new commit
-        run: |
+          # Tagging the new commit
           TAG_NAME="v$(date +'%Y%m%d%H%M%S')"
           git tag -a $TAG_NAME -m "Auto-generated tag for proto generation"
 
-      - name: Push the commit and tag using the token
-        run: |
-          git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          # Push the commit and tag using the token
           git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} $TAG_NAME
+          git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+
