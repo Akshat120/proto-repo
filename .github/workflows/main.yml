@@ -62,3 +62,4 @@ jobs:
           # Push the commit and tag using the token
           git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} $TAG_NAME
           git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+
