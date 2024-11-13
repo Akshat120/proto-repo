@@ -1,0 +1,48 @@
+name: ProtoBuf Go Generator
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  generate-proto-go:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '^1.20'
+
+      - name: Generate Go source files from ProtoBuf
+        run: |
+          make generate  # or replace with your specific shell script
+        env:
+          GO111MODULE: "on"
+
+      - name: Commit and tag if push to main or master
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Commit changes if there are any
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add .
+            git commit -m "Auto-generate Go files from proto on push to main/master"
+          fi
+
+          # Tagging the new commit
+          TAG_NAME="v$(date +'%Y%m%d%H%M%S')"
+          git tag -a $TAG_NAME -m "Auto-generated tag for proto generation"
+          git push origin $TAG_NAME
+          git push origin main:main  # Adjust for master if needed
