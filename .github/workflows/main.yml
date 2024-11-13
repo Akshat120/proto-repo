@@ -28,6 +28,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y protobuf-compiler
 
+      - name: Install protoc-gen-go plugin
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        env:
+          GO111MODULE: "on"
+
+      - name: Add Go bin to PATH
+        run: echo "$HOME/go/bin" >> $GITHUB_PATH
+
       - name: Generate Go source files from ProtoBuf
         run: |
           make generate  # Replace with your specific make command if needed
