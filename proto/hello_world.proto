@@ -3,5 +3,5 @@ syntax = "proto3";
 option go_package="proto-repo/protogen/go";
 
 message Hello {
-    string name = 1
+    string name = 1;
 }
