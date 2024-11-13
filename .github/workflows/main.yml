@@ -60,5 +60,5 @@ jobs:
           git tag -a $TAG_NAME -m "Auto-generated tag for proto generation"
 
           # Push the commit and tag using the token
-          git push https://x-access-token:${{ secrets.proto_repo_access_token }}@github.com/${{ github.repository }} $TAG_NAME
-          git push https://x-access-token:${{ secrets.proto_repo_access_token }}@github.com/${{ github.repository }} HEAD:main
+          git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} $TAG_NAME
+          git push https://x-access-token:${{ secrets.GH_PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
